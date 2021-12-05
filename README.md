@@ -13,6 +13,10 @@ ajudar a controlar e acompanhar o seu diabetes, seja
 
 **Da biblioteca `matplotlib`, usa-se o `pyplot`**
 
+**MySQL**
+
+**Biblioteca `mysql.connector`**
+
 ### Como utilizar?
 
 1º Fazer download do matplotlib: `pip install matplotlib`

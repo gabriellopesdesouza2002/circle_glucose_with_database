@@ -176,17 +176,18 @@ def envia_glic_ao_levant(id_user, glicemia, data, hora):
 
 glicemias_01 = []
 glicemias_01_hora = []
-#
-# for hora in glicemias_01_hora:
-#         if strptime(hora, '%H:%M:S'):
-#             return datetime.strptime(data_str, '%d/%m/%y').date()
-#     except ValueError:
-#         return False
 glicemias_01_data = []
 
 
-def recupera_glicemia_glic_ao_levant():
+def recupera_glicemia_glic_ao_levant():  # Recupera GLICEMIA, HORA, DATA das medições
     global id
+    global glicemias_01
+    global glicemias_01_hora
+    global glicemias_01_data
+
+    glicemias_01 = []
+    glicemias_01_hora = []
+    glicemias_01_data = []
     conexao = mysql.connector.connect(
         host='localhost',
         user='root',
@@ -199,17 +200,14 @@ def recupera_glicemia_glic_ao_levant():
     cur.execute(f'select glicemia from glicemias_ao_levant_users where id_usuario = "{id}"')
     for glicemia_tuple in cur:
         for glicemia in glicemia_tuple:
-            global glicemias_01
             glicemias_01.append(glicemia)
     cur.execute(f'select hora_glicemia from glicemias_ao_levant_users where id_usuario = "{id}"')
     for hora_glicemia_tuple in cur:
         for hora in hora_glicemia_tuple:
-            global glicemias_01_hora
             glicemias_01_hora.append(hora)
     cur.execute(f'select data_glicemia from glicemias_ao_levant_users where id_usuario = "{id}"')
     for data_glicemia_tuple in cur:
         for data in data_glicemia_tuple:
-            global glicemias_01_data
             glicemias_01_data.append(data)
     # SQL CODE
     cur.close()

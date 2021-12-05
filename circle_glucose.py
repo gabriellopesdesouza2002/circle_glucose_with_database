@@ -243,7 +243,7 @@ def addValor():
                                     sleep(2)
                                     escolhe_periodo()
                             else:  # SE A HORA FOR INVÁLIDA RETORNA
-                                print('Não deu...')
+                                print('Hora inválida! Tente novamente...')
                                 escolhe_periodo()
                         else:  # SE A DATA FOR INVÁLIDA RETORNA
                             print(f'A data {data_usuario} é inválida! Tente novamente...\n')
