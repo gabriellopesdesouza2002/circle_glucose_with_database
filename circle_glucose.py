@@ -341,9 +341,14 @@ def verMedidas():
             print('\033[1;31mNão há valores ainda aqui!\033[m')
             glicemiaApp()
         else:
-            print(dados.glicemias_01_hora)
-            print(f'{dados.nome} Atualmente você tem {len(dados.glicemias_01)} medidas.')
-            print('Mostrando...')
+            print(f'\n{dados.nome} Atualmente você tem {len(dados.glicemias_01)} medidas.')
+            print('Mostrando', end='')
+            for contador in range(3):
+                print('.', end='')
+                sleep(1)
+            else:
+                print()
+                print()
             for contador in range(len(dados.glicemias_01_data)):
                 print(f'Glicemia: {dados.glicemias_01[contador]}\n'
                       f'    Hora: {dados.glicemias_01_hora[contador]}\n'

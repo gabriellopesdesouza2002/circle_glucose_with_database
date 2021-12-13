@@ -8,14 +8,19 @@ nome = ''
 id = 0
 
 
+# CONEXÃO COM O BANCO
+def conecta_banco(host='localhost', user='root', passwd='bolarede792', database='circle_glucose'):
+    return mysql.connector.connect(host=host, user=user, passwd=passwd, database=database)
+
+
+conexao = conecta_banco()
+
+
+# CONEXÃO COM O BANCO
+
+
 def pega_id(email):
-    conexao = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        passwd='bolarede792',
-        database='circle_glucose',
-        port='3306'
-    )
+    conexao = conecta_banco()
     cur = conexao.cursor(buffered=True)
     # SQL CODE
     cur.execute(f"SELECT id FROM usuarios WHERE email = '{email}'")
@@ -36,18 +41,9 @@ def pega_id(email):
     conexao.close()
 
 
-# PEGA O NOME E O ID DO USUÁRIO
-
-
 # FUNÇÃO PARA ADICIONAR NOVO USUARIO AO BANCO DE DADOS EM CASO DE CADASTRO
 def adiciona_usuario(nome, email, senha):
-    conexao = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        passwd='bolarede792',
-        database='circle_glucose',
-        port='3306'
-    )
+    conexao = conecta_banco()
     cur = conexao.cursor(buffered=True)
     # SQL CODE
     cur.execute(f"insert into usuarios(nome, email, senha) values('{nome}', '{email}', '{senha}')")
@@ -67,22 +63,13 @@ emails = []
 def recupera_emails():
     global emails
     emails = []
-    conexao = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        passwd='bolarede792',
-        database='circle_glucose',
-        port='3306'
-    )
+    conexao = conecta_banco()
     cur = conexao.cursor(buffered=True)
     # SQL CODE
     cur.execute('SELECT email FROM usuarios')
     # SQL CODE
-    for emails_tuple in cur:
-        for email in emails_tuple:
-            emails.append(email)
-    else:
-        emails = tuple(emails)
+    emails = [email for tupla in cur for email in tupla]
+    emails = tuple(emails)
 
     cur.close()
     conexao.commit()
@@ -98,35 +85,22 @@ senhas = []
 def recupera_senhas():
     global senhas
     senhas = []
-    conexao = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        passwd='bolarede792',
-        database='circle_glucose',
-        port='3306'
-    )
+    conexao = mysql.connector.connect(host='localhost', user='root', passwd='bolarede792', database='circle_glucose')
     cur = conexao.cursor(buffered=True)
     # SQL CODE
     cur.execute('SELECT senha FROM usuarios')
     # SQL CODE
-    for senha_tuple in cur:
-        for senha in senha_tuple:
-            senhas.append(senha)
-    else:
-        senhas = tuple(senhas)
+
+    senhas = [senha for tupla in cur for senha in tupla]
+    senhas = tuple(senhas)
+
     cur.close()
     conexao.commit()
     conexao.close()
 
 
 def altera_email(email_antigo, email_novo):
-    conexao = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        passwd='bolarede792',
-        database='circle_glucose',
-        port='3306'
-    )
+    conexao = mysql.connector.connect(host='localhost', user='root', passwd='bolarede792', database='circle_glucose')
     cur = conexao.cursor(buffered=True)
     # SQL CODE
     cur.execute(f'UPDATE usuarios SET email = "{email_novo}" where email = "{email_antigo}"')
@@ -137,13 +111,7 @@ def altera_email(email_antigo, email_novo):
 
 
 def altera_senha(senha_atual, senha_nova):
-    conexao = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        passwd='bolarede792',
-        database='circle_glucose',
-        port='3306'
-    )
+    conexao = mysql.connector.connect(host='localhost', user='root', passwd='bolarede792', database='circle_glucose')
     cur = conexao.cursor(buffered=True)
     # SQL CODE
     cur.execute(f'UPDATE usuarios SET senha = "{senha_nova}" where senha = "{senha_atual}"')
@@ -157,13 +125,7 @@ def altera_senha(senha_atual, senha_nova):
 
 # OPERAÇÕES NA TABELA DE [AO LEVANTAR] (INSERÇÃO E CONSULTA DE DADOS)
 def envia_glic_ao_levant(id_user, glicemia, data, hora):
-    conexao = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        passwd='bolarede792',
-        database='circle_glucose',
-        port='3306'
-    )
+    conexao = mysql.connector.connect(host='localhost', user='root', passwd='bolarede792', database='circle_glucose')
     cur = conexao.cursor(buffered=True)
     # SQL CODE
     cur.execute(f'INSERT INTO glicemias_ao_levant_users(id_usuario, glicemia, data_glicemia, hora_glicemia) '
@@ -174,9 +136,11 @@ def envia_glic_ao_levant(id_user, glicemia, data, hora):
     conexao.close()
 
 
+# GLICEMIAS_01 --- AO_LEVANTAR
 glicemias_01 = []
 glicemias_01_hora = []
 glicemias_01_data = []
+glicemias_completo = zip(glicemias_01, glicemias_01_hora, glicemias_01_data)
 
 
 def recupera_glicemia_glic_ao_levant():  # Recupera GLICEMIA, HORA, DATA das medições
@@ -188,35 +152,68 @@ def recupera_glicemia_glic_ao_levant():  # Recupera GLICEMIA, HORA, DATA das med
     glicemias_01 = []
     glicemias_01_hora = []
     glicemias_01_data = []
+
+    conexao = mysql.connector.connect(host='localhost', user='root', passwd='bolarede792', database='circle_glucose', )
+
+    cur = conexao.cursor(buffered=True)
+
+    cur.execute(f'select glicemia from glicemias_ao_levant_users where id_usuario = "{id}"')  # SQL CODE
+    glicemias_01 = [glicemia for tupla in cur for glicemia in tupla]
+
+    cur.execute(f'select hora_glicemia from glicemias_ao_levant_users where id_usuario = "{id}"')  # SQL CODE
+    glicemias_01_hora = [hora for tupla in cur for hora in tupla]
+
+    cur.execute(f'select data_glicemia from glicemias_ao_levant_users where id_usuario = "{id}"')  # SQL CODE
+    glicemias_01_data = [data for tupla in cur for data in tupla]
+
+    cur.close()
+    conexao.commit()
+    conexao.close()
+
+
+# GLICEMIAS_01 --- AO_LEVANTAR
+
+
+glicemias_02 = []
+glicemias_02_hora = []
+glicemias_02_data = []
+
+
+def recupera_glicemia_glic_ant_almoc():  # Recupera GLICEMIA, HORA, DATA das medições
+    global id
+    global glicemias_02
+    global glicemias_02_hora
+    global glicemias_02_data
+
+    glicemias_02 = []
+    glicemias_02_hora = []
+    glicemias_02_data = []
     conexao = mysql.connector.connect(
         host='localhost',
         user='root',
         passwd='bolarede792',
         database='circle_glucose',
-        port='3306'
     )
     cur = conexao.cursor(buffered=True)
     # SQL CODE
-    cur.execute(f'select glicemia from glicemias_ao_levant_users where id_usuario = "{id}"')
+    cur.execute(f'select glicemia from glicemias_ant_almoc_users where id_usuario = "{id}"')
     for glicemia_tuple in cur:
         for glicemia in glicemia_tuple:
-            glicemias_01.append(glicemia)
-    cur.execute(f'select hora_glicemia from glicemias_ao_levant_users where id_usuario = "{id}"')
+            glicemias_02.append(glicemia)
+    cur.execute(f'select hora_glicemia from glicemias_ant_almoc_users where id_usuario = "{id}"')
     for hora_glicemia_tuple in cur:
         for hora in hora_glicemia_tuple:
-            glicemias_01_hora.append(hora)
-    cur.execute(f'select data_glicemia from glicemias_ao_levant_users where id_usuario = "{id}"')
+            glicemias_02_hora.append(hora)
+    cur.execute(f'select data_glicemia from glicemias_ant_almoc_users where id_usuario = "{id}"')
     for data_glicemia_tuple in cur:
         for data in data_glicemia_tuple:
-            glicemias_01_data.append(data)
+            glicemias_02_data.append(data)
     # SQL CODE
     cur.close()
     conexao.commit()
     conexao.close()
 
 
-glicemias_02 = []
-glicemias_02_hora = []
 glicemias_03 = []
 glicemias_03_hora = []
 glicemias_04 = []
